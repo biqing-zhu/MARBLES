@@ -9,11 +9,8 @@ output:
     self_contained: yes
     toc: yes
 editor_options: 
-  %\VignetteIndexEntry{introduction}
-  %\VignetteEncoding{UTF-8}
-  chunk_output_type: consolevignette: >
-  %\VignetteEngine{knitr::rmarkdown}
-bibliography: "`r file.path(system.file('.', package = 'MARBLES'), 'refs.bib')`"
+  chunk_output_type: console
+bibliography: "`r file.path(system.file('data', package = 'MARBLES'), 'refs.bib')`"
 ---
 
 <!--
