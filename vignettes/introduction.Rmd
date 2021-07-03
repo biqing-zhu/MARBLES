@@ -1,6 +1,7 @@
 ---
 title: "MARBLES Vignette"
 author: "Biqing Zhu"
+package: "`r BiocStyle::pkg_ver('MARBLES')`"
 date: "`r Sys.Date()`"
 output:
   pdf_document:
@@ -8,15 +9,19 @@ output:
   html_document:
     self_contained: yes
     toc: yes
-editor_options: 
-  chunk_output_type: console
+vignette: >
+  %\VignetteIndexEntry{MARBLES Vignette}
+  %\VignettePackage{MARBLES}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 bibliography: "`r file.path(system.file('data', package = 'MARBLES'), 'refs.bib')`"
 ---
 
-<!--
-%\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{MARBLES Vignette}
--->
+<style type="text/css">
+.smaller {
+  font-size: 10px
+}
+</style>
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -25,13 +30,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-### Installing MARBLES from GitHub
+# Installing MARBLES from GitHub
 
 ```{r setup, warning = FALSE, message = FALSE}
 library(MARBLES)
 ```
 
-### Main Function
+# Main Function
 
 The main function is
 
@@ -39,11 +44,11 @@ The main function is
 ?run_MRF()
 ```
 
-It requires three input values: (1) paraMRF: Starting value of the model parameter \Phi; (2) expr: A pseudo-bulk expression list for a gene. Each item is a vector of the pseudo-bulk expression across all individuals for a cell type in a condition. The list names should start with 'Cond1_' or 'Cond2_', and followed by the name of the cell type; (3) c_c: A binary cell type relationship network matrix. 1 means connected, and 0 means not connected; and (4) x_init: Initial DE status. Should be a binary vector of length nk. 1 means DE, and 0 means EE. The usage of this function will be illustrated on the following real data application.
+It requires three input values: (1) paraMRF: Starting value of the model parameter $\Phi$; (2) expr: A pseudo-bulk expression list for a gene. Each item is a vector of the pseudo-bulk expression across all individuals for a cell type in a condition. The list names should start with 'Cond1_' or 'Cond2_', and followed by the name of the cell type; (3) c_c: A binary cell type relationship network matrix. 1 means connected, and 0 means not connected; and (4) x_init: Initial DE status. Should be a binary vector of length n_k. 1 means DE, and 0 means EE. The usage of this function will be illustrated in the following real data application.
 
-### Example
+# Example
 
-We obtained the mouse cortex snRNA-seq dataset from the R package `r Biocpkg("muscData")` [@crowell2020muscat]. The data has already been pre-processed as well as annotated, and contains four control and four lipopolysaccharide (LPS)-treated mice.
+We obtained the mouse cortex snRNA-seq dataset from the R package `r BiocStyle::Biocpkg("muscData")` [@crowell2020muscat]. The data has already been pre-processed as well as annotated, and contains four control and four lipopolysaccharide (LPS)-treated mice.
 ```{r, warning = FALSE, message = FALSE}
 library(muscData)
 library(muscat)
@@ -56,27 +61,28 @@ mouse <- prepSCE(mouse,
                 drop = TRUE)  # drop all other colData columns
 ```
 
-Since we wanted to focus on neurons and glial cells, we only selected astrocytes, microglia, oligodendrocyte progenitor cells (OPC), oligodendrocytes, excitatory neurons, and inhibitory neurons for the downstream analyses, but we only keep the first 1,000 genes for demonstration purposes. And we applied the function `aggregateData` in the R package `r Biocpkg("muscat")` [@crowell2020muscat] to get cell-type-specific pseudobulk data.
+Since we wanted to focus on neurons and glial cells, we only selected astrocytes, microglia, oligodendrocyte progenitor cells (OPC), oligodendrocytes, excitatory neurons, and inhibitory neurons for the downstream analyses, and only kept the first 1,000 genes for demonstration purposes. And we applied the function `aggregateData` in the R package `r BiocStyle::Biocpkg("muscat")` [@crowell2020muscat] to get cell-type-specific pseudobulk data.
 
 ```{r, warning = FALSE, message = FALSE}
-pb <- aggregateData(mouse[, !mouse$cluster_id %in% c('Endothelial', "CPE cells")])
+pb <- aggregateData(mouse[1:1000, !mouse$cluster_id %in% c('Endothelial', "CPE cells")])
 ```
 
 Then, we created a cell type relationship network based on domain knowledge to represent the similarity and cell lineage.
 
 ```{r}
 ## Create connection matrix (OPC connected to neurons)
-celltypes <- c('Astrocytes', 'Excit. Neuron', 'Inhib. Neuron', 'Microglia', 'Oligodendrocytes', 'OPC')
+celltypes <- c('Astrocytes', 'Excit. Neuron', 'Inhib. Neuron', 
+               'Microglia', 'Oligodendrocytes', 'OPC')
 c_c <- matrix(1, nrow = length(celltypes), ncol = length(celltypes))
 rownames(c_c) <- colnames(c_c) <- celltypes
 conn <- c(0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 1, 1)
 c_c[lower.tri(c_c)] <- conn
 c_c <- t(c_c)
 c_c[lower.tri(c_c)] <- conn
-conn
+c_c
 ```
 
-`r Biocpkg("edgeR")` [@robinson2010edger] was first applied to the pseudo-bulk data to get the DE states using `pbDS`
+`r BiocStyle::Biocpkg("edgeR")` [@robinson2010edger] was first applied to the pseudo-bulk data to get the DE states using `pbDS`
 ```{r, warning = FALSE, message = FALSE}
 res_edger <- pbDS(pb, method = "edgeR", verbose = FALSE)
 tbl_edger <- res_edger$table[[1]]
@@ -96,23 +102,25 @@ results_gene <- lapply(results_fil, function(u) u$gene)
 pseudo_bulk_lst <- pb@assays@data@listData
 ```
 
-In order to input into our model, the data structure was rearranged such that each element of the list represents a gene, and within each element, each item is a vector of the pseudo-bulk expression across all individuals for a cell type in a condition.
+In order to input the data into our model, it's structure was rearranged such that each element of the list represents a gene, and within each element, each item is a vector of the pseudo-bulk expression across all individuals for a cell type in a condition.
 
 ```{r}
 pseudo_bulk_lst_new <- list()
 for(gene in rownames(pseudo_bulk_lst[[1]])) {
     pseudo_bulk_lst_new[[gene]] <- list()
     for(celltype in celltypes) {
-        pseudo_bulk_lst_new[[gene]][[paste0('Cond1_', celltype)]] <- unlist(pseudo_bulk_lst[[celltype]][gene, 1:4])
-        pseudo_bulk_lst_new[[gene]][[paste0('Cond2_', celltype)]] <- unlist(pseudo_bulk_lst[[celltype]][gene, 5:8])
+        pseudo_bulk_lst_new[[gene]][[paste0('Cond1_', celltype)]] <- 
+          unlist(pseudo_bulk_lst[[celltype]][gene, 1:4])
+        pseudo_bulk_lst_new[[gene]][[paste0('Cond2_', celltype)]] <- 
+          unlist(pseudo_bulk_lst[[celltype]][gene, 5:8])
     }
 }
-str(pseudo_bulk_lst_new)
+str(pseudo_bulk_lst_new[[1]])
 ```
 
-Finally, we applied our method initialized with the edgeR results.
+Finally, we ran our method with edgeR initialization.
 
-```{r}
+```{r, warning = FALSE, message = FALSE}
 x_mat_edger <- matrix(0, length(pseudo_bulk_lst_new), length(celltypes))
 rownames(x_mat_edger) <- names(pseudo_bulk_lst_new)
 colnames(x_mat_edger) <- celltypes
@@ -120,18 +128,19 @@ for (celltype in celltypes) {
    x_mat_edger[results_fil[[celltype]]$gene, celltype] <- 1
 }
 x_mat_edger <- lapply(seq_len(nrow(x_mat_edger)), function(i) x_mat_edger[i,])
-results_edger <- mapply(icm, expr = pseudo_bulk_lst_new, x_init = x_mat_edger, MoreArgs = list(paraMRF = c(0, 2), distr = 'PG', c_c = c_c), SIMPLIFY = FALSE)
+results_edger <- mapply(run_MRF, expr = pseudo_bulk_lst_new, x_init = x_mat_edger, 
+                        MoreArgs = list(paraMRF = c(0, 2), c_c = c_c), SIMPLIFY = FALSE)
 ```
-The \Phi parameter for the first gene can be retrieved by 
+The $\Phi$ parameter for the 10th gene can be retrieved by 
 
 ```{r}
-results_edger[[1]]$phi_mat[,ncol(results_edger[[1]]$phi_mat)]
+results_edger[[10]]$phi_mat[,ncol(results_edger[[10]]$phi_mat)]
 ```
 
 And the DE states is
 
 ```{r}
-results_edger[[1]]$x_mat[,ncol(results_edger[[1]]$x_mat)]
+results_edger[[10]]$x_mat[,ncol(results_edger[[10]]$x_mat)]
 ```
 
 # References

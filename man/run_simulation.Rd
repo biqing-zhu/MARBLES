@@ -29,7 +29,7 @@ run_simulation(
 
 \item{ng}{number of genes to simulate.}
 
-\item{de_perc}{percentage of cell types to be DE when initializing \deqn{X_0}.}
+\item{de_perc}{percentage of cell types to be DE when initializing X0.}
 
 \item{lfc}{numeric value to use as mean logFC
 (logarithm base 2) for DE genes.}
@@ -38,16 +38,16 @@ run_simulation(
 
 \item{iter}{number of iterations when sampling X.}
 
-\item{\\gamma, \\beta}{\\Phi used for sampling the state matrix X.}
+\item{\eqn{\gamma}, \eqn{\beta}}{\eqn{\Phi} used for sampling the state matrix X.}
 }
 \value{
 The estimated model parameters and the DE status
 
 a \code{\link[SingleCellExperiment]{SingleCellExperiment}}
-containing multiple clusters & samples across 2 groups
+containing multiple clusters & samples across two groups
 as well as the following metadata: \describe{
 \item{cell metadata (\code{colData(.)})}{a \code{DataFrame} containing,
-containing, for each cell, it's cluster, sample, and group ID.}
+for each cell, it's cluster, sample, and group ID.}
 \item{experiment metadata (\code{metadata(.)})}{
 \describe{
 \item{\code{experiment_info}}{a \code{data.frame}
@@ -58,7 +58,7 @@ in each cluster, it's differential distribution \code{category},
 mean \code{logFC} (NA for genes for categories "ee"),
 gene used as reference (\code{sim_gene}), dispersion \code{sim_disp},
 and simulation means for each group \code{sim_mean.A/B}.}
-\item{\code{ref_sids/kidskids}}{the sample/cluster IDs used as reference.}
+\item{\code{ref_sids/kids}}{the sample/cluster IDs used as reference.}
 \item{\code{args}}{a list of the function call's input arguments.}}}}
 }
 \description{

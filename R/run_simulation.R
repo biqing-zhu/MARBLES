@@ -7,18 +7,18 @@
 #' @param ns number of samples to simulate.
 #' @param nk number of cell types to simulate.  
 #' @param ng number of genes to simulate. 
-#' @param de_perc percentage of cell types to be DE when initializing \deqn{X_0}.
+#' @param de_perc percentage of cell types to be DE when initializing X0.
 #' @param lfc numeric value to use as mean logFC 
 #'   (logarithm base 2) for DE genes.
 #' @param c_c cell type relationship network matrix. 1 means connected, and 0 means not connected.
-#' @param \\gamma,\\beta \\Phi used for sampling the state matrix X.
+#' @param \eqn{\gamma},\eqn{\beta} \eqn{\Phi} used for sampling the state matrix X.
 #' @param iter number of iterations when sampling X.
 #' @return The estimated model parameters and the DE status
 #' @return a \code{\link[SingleCellExperiment]{SingleCellExperiment}}
-#'   containing multiple clusters & samples across 2 groups 
+#'   containing multiple clusters & samples across two groups 
 #'   as well as the following metadata: \describe{
 #'   \item{cell metadata (\code{colData(.)})}{a \code{DataFrame} containing,
-#'   containing, for each cell, it's cluster, sample, and group ID.}
+#'   for each cell, it's cluster, sample, and group ID.}
 #'   \item{experiment metadata (\code{metadata(.)})}{
 #'   \describe{
 #'   \item{\code{experiment_info}}{a \code{data.frame} 
@@ -29,7 +29,7 @@
 #'   mean \code{logFC} (NA for genes for categories "ee"),
 #'   gene used as reference (\code{sim_gene}), dispersion \code{sim_disp},
 #'   and simulation means for each group \code{sim_mean.A/B}.}
-#'   \item{\code{ref_sids/kidskids}}{the sample/cluster IDs used as reference.}
+#'   \item{\code{ref_sids/kids}}{the sample/cluster IDs used as reference.}
 #'   \item{\code{args}}{a list of the function call's input arguments.}}}}
 #' @export
 #' 

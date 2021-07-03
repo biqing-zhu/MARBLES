@@ -7,7 +7,7 @@
 run_MRF(paraMRF, expr, c_c, x_init)
 }
 \arguments{
-\item{paraMRF}{Starting value of the model parameter \\Phi.}
+\item{paraMRF}{Starting values of the model parameter \eqn{\Phi}.}
 
 \item{expr}{Pseudo-bulk expression list for a gene. Each item is a vector of the pseudo-bulk expression across all individuals for a cell type in a condition. The list names should start with 'Cond1_' or 'Cond2_', and followed by the name of the cell type.}
 
@@ -17,10 +17,10 @@ run_MRF(paraMRF, expr, c_c, x_init)
 }
 \value{
 The estimated model parameters and the DE status: \describe{
-\item{x_mat}{Trace of the DE status for each cell type in the ICM algorithm. A 2-dimensional array: (num of cell types)\\cdot(num of iterations). The first column represents the initialization, and the last column represents the final DE status.}
-\item{theta_mat}{Trace of the estimated model parameters \\Theta in the ICM algorithm. A 2-dimensional array: 2\\cdot(num of iterations). The first column represents the initialization, and the last column represents the final parameters.}
-\item{phi_mat}{Trace of the estimated model parameters \\Phi in the ICM algorithm. A 2-dimensional array: 2\\cdot(num of iterations). The first column represents the initialization, and the last column represents the final parameters.}}
+\item{x_mat}{Trace of the DE status for each cell type in the ICM algorithm. A 2-dimensional array: (num of cell types)\eqn{*}(num of iterations). The first column represents the initialization, and the last column represents the final DE status.}
+\item{theta_mat}{Trace of the estimated model parameters \eqn{\Theta} in the ICM algorithm. A 2-dimensional array: 2\eqn{*}(num of iterations). The first column represents the initialization, and the last column represents the final parameters.}
+\item{phi_mat}{Trace of the estimated model parameters \eqn{\Phi} in the ICM algorithm. A 2-dimensional array: 2\eqn{*}(num of iterations). The first column represents the initialization, and the last column represents the final parameters.}}
 }
 \description{
-Run the MRF model to estimate the DE state for each gene across each cell type.
+Run the MRF model to estimate the DE state for each gene across cell types.
 }
