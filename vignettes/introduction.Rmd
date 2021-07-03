@@ -33,6 +33,10 @@ knitr::opts_chunk$set(
 # Installing MARBLES from GitHub
 
 ```{r setup, warning = FALSE, message = FALSE}
+if (!requireNamespace("devtools", quietly = TRUE))
+    install.packages("devtools")
+library(devtools)
+install_github("biqing-zhu/MARBLES")
 library(MARBLES)
 ```
 
